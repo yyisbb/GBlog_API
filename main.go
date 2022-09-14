@@ -1,8 +1,11 @@
 package main
 
-import "gblog_api/config"
+import (
+	"gblog_api/cmd"
+	"gblog_api/config"
+)
 
 func main() {
-	//注册配置中心
-	config.RegisterConfigCenter()
+	//注册配置中心并启动
+	cmd.Run(config.RegisterConfigCenter)
 }

@@ -128,15 +128,20 @@ func GetArticleByName(c *gin.Context) {
 //  @param c
 //
 func GetAllArticle(c *gin.Context) {
+	page := c.Query("page")
 	//查询所有文章进行展示
+	//查询数量
+	var count int64
+	global.GlobalMysql.Model(models.Article{}).Count(&count)
+
 	var articles []models.Article
-	if err := global.GlobalMysql.Model(models.Article{}).Order("created_at desc").Find(&articles).Error; err != nil {
+	if err := global.GlobalMysql.Model(models.Article{}).Scopes(utils.Paginate(page, "10")).Order("created_at desc").Find(&articles).Error; err != nil {
 		log.Println("[DeleteArticle] Articles Not Found")
 		pkg.ResponseJsonError(c, pkg.ERROR_DATA_NOT_FUOUND)
 		return
 	}
 	//文章存在
-	pkg.ResponseJsonOKAndData(c, articles)
+	pkg.ResponseJsonOKAndDataCount(c, articles, utils.ComputeCount(count))
 }
 
 //
