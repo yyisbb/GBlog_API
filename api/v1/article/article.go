@@ -106,7 +106,7 @@ func GetArticleTimeProportion(c *gin.Context) {
 //  @param c
 //
 func GetArticleByName(c *gin.Context) {
-	//获取文章id
+	//获取文章标题
 	title := c.Query("title")
 	//查询对应文章进行展示
 	var article []models.Article

@@ -9,7 +9,7 @@ type Article struct {
 	//文章首页大图
 	BackGround string `json:"backGround,omitempty" validate:"required"`
 	//文章内容
-	Content string `json:"content,omitempty" validate:"required"`
+	Content string `json:"content,omitempty" validate:"required" gorm:"type:longtext"`
 	//文章分类ID
 	CategoryID int `json:"categoryID,omitempty" validate:"required"`
 	//分享数
