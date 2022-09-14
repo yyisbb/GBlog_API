@@ -35,6 +35,15 @@ func CreateArticle(c *gin.Context) {
 	var setting models.Setting
 	global.GlobalMysql.Model(models.Setting{}).First(&setting)
 
+	//判断文章分类存不存在
+	var category models.Category
+	global.GlobalMysql.Model(models.Category{}).Where("id = ?", article.CategoryID).First(&category)
+	if category.ID == 0 {
+		log.Println("[CreateArticle] Category Not Found")
+		pkg.ResponseJsonError(c, pkg.ERROR_DATA_NOT_FUOUND)
+		return
+	}
+
 	//创建文章
 	if err := global.GlobalMysql.Create(&article).Error; err != nil {
 		log.Println("[CreateArticle] Create Article Error")
@@ -161,7 +170,7 @@ func GetArticleByCategoryID(c *gin.Context) {
 //
 func DeleteArticle(c *gin.Context) {
 	//获取文章id
-	id := c.Query("id")
+	id := c.PostForm("id")
 
 	if len(id) == 0 {
 		//id为空
@@ -215,9 +224,9 @@ func UpdateArticle(c *gin.Context) {
 		return
 	}
 
-	var oldArticle models.Setting
+	var oldArticle models.Article
 	//判断是否有该条文章
-	global.GlobalMysql.Model(models.Setting{}).Where("id = ?", article.ID).First(&oldArticle)
+	global.GlobalMysql.Model(models.Article{}).Where("id = ?", article.ID).First(&oldArticle)
 	if oldArticle.ID == 0 {
 		//id为空
 		log.Println("[UpdateArticle] Article Not Found")
@@ -225,7 +234,7 @@ func UpdateArticle(c *gin.Context) {
 		return
 	}
 
-	if err := global.GlobalMysql.Model(models.Article{}).Where("id = ?", article.ID).Save(&article).Error; err != nil {
+	if err := global.GlobalMysql.Model(models.Article{}).Where("id = ?", article.ID).Updates(&article).Error; err != nil {
 		log.Println("[UpdateArticle] Save Article Error")
 		pkg.ResponseJsonError(c, pkg.ERROR_SQL)
 		return

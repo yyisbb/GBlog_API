@@ -7,7 +7,10 @@ import (
 )
 
 func DBAutoCreate() {
-	err := global.GlobalMysql.AutoMigrate(&models.Article{}, &models.Setting{}, &models.Category{})
+	err := global.GlobalMysql.AutoMigrate(&models.Article{},
+		&models.Setting{},
+		&models.Category{},
+		&models.Comment{})
 	if err != nil {
 		log.Println("[DBAutoCreate]")
 	}

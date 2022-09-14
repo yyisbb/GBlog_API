@@ -30,6 +30,9 @@ func SetRouter(r *gin.Engine) {
 	//分类相关
 	categoryGroup := v1Group.Group("/category")
 	categoryGroup.GET("/getCategory", category.GetCategory)
+	categoryGroup.POST("/deleteCategory", category.DeleteCategory)
+	categoryGroup.POST("/createCategory", category.CreateCategory)
+	categoryGroup.POST("/updateCategory", category.UpdateCategory)
 }
 
 func SetMiddleware(r *gin.Engine) {

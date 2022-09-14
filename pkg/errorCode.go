@@ -6,6 +6,7 @@ const (
 	ERROR_SQL             = 10002 //SQL执行失败
 	ERROR_PARAM           = 10003 //参数错误
 	ERROR_DATA_NOT_FUOUND = 10004 //数据不存在
+	ERROR_DATA_EXIST      = 10005 //数据已存在
 )
 
 var (
@@ -15,6 +16,7 @@ var (
 		ERROR_SQL:             "SQL Execute Error",
 		ERROR_PARAM:           "Param Error",
 		ERROR_DATA_NOT_FUOUND: "Data Not Found",
+		ERROR_DATA_EXIST:      "Data Exist",
 	}
 )
 
