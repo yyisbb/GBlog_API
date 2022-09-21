@@ -102,7 +102,7 @@ func GetArticleTimeProportion(c *gin.Context) {
 
 //
 // GetArticleByName
-//  @Description: 根据ID获取文章
+//  @Description: 根据Title获取文章
 //  @param c
 //
 func GetArticleByName(c *gin.Context) {
@@ -140,6 +140,12 @@ func GetAllArticle(c *gin.Context) {
 		pkg.ResponseJsonError(c, pkg.ERROR_DATA_NOT_FUOUND)
 		return
 	}
+	//遍历所有的文章
+	for i := 0; i < len(articles); i++ {
+		var category models.Category
+		global.GlobalMysql.Model(models.Category{}).Where("id = ?", articles[i].CategoryID).First(&category)
+		articles[i].CategoryName = category.Name
+	}
 	//文章存在
 	pkg.ResponseJsonOKAndDataCount(c, articles, utils.ComputeCount(count))
 }
@@ -175,9 +181,16 @@ func GetArticleByCategoryID(c *gin.Context) {
 //
 func DeleteArticle(c *gin.Context) {
 	//获取文章id
-	id := c.PostForm("id")
-
-	if len(id) == 0 {
+	var temp struct {
+		Id int `json:"id"`
+	}
+	err := c.ShouldBindJSON(&temp)
+	if err != nil {
+		log.Println("[DeleteArticle] Json Parse Error")
+		pkg.ResponseJsonError(c, pkg.ERROR_JSONPARSE)
+		return
+	}
+	if temp.Id == 0 {
 		//id为空
 		log.Println("[DeleteArticle] Param Error")
 		pkg.ResponseJsonError(c, pkg.ERROR_PARAM)
@@ -186,7 +199,7 @@ func DeleteArticle(c *gin.Context) {
 
 	//查询对应文章进行展示
 	var article models.Article
-	global.GlobalMysql.Model(models.Article{}).Where("id = ?", id).First(&article)
+	global.GlobalMysql.Model(models.Article{}).Where("id = ?", temp.Id).First(&article)
 
 	if article.ID == 0 {
 		//文章不存在
@@ -196,7 +209,7 @@ func DeleteArticle(c *gin.Context) {
 	}
 
 	//文章存在就删除
-	global.GlobalMysql.Model(models.Article{}).Delete(&models.Article{}, id)
+	global.GlobalMysql.Model(models.Article{}).Delete(&models.Article{}, temp.Id)
 	pkg.ResponseJsonOK(c)
 }
 
@@ -241,6 +254,47 @@ func UpdateArticle(c *gin.Context) {
 
 	if err := global.GlobalMysql.Model(models.Article{}).Where("id = ?", article.ID).Updates(&article).Error; err != nil {
 		log.Println("[UpdateArticle] Save Article Error")
+		pkg.ResponseJsonError(c, pkg.ERROR_SQL)
+		return
+	}
+
+	pkg.ResponseJsonOK(c)
+}
+
+//
+// AddWatchNum
+//  @Description: 新增浏览量
+//  @param c
+//
+func AddWatchNum(c *gin.Context) {
+	//获取文章id
+	var temp struct {
+		Id string `json:"id"`
+	}
+	err := c.ShouldBindJSON(&temp)
+	if len(temp.Id) == 0 {
+		//id为空
+		log.Println("[AddWatchNum] Param Error")
+		pkg.ResponseJsonError(c, pkg.ERROR_PARAM)
+		return
+	}
+
+	//查询对应文章进行展示
+	var article models.Article
+	global.GlobalMysql.Model(models.Article{}).Where("id = ?", temp.Id).First(&article)
+
+	if article.ID == 0 {
+		//文章不存在
+		log.Println("[AddWatchNum] Article Not Found")
+		pkg.ResponseJsonError(c, pkg.ERROR_DATA_NOT_FUOUND)
+		return
+	}
+
+	//新增文章访问量
+	err = global.GlobalMysql.Model(models.Article{}).Where("id = ?", temp.Id).Update("watch_num", article.WatchNum+1).Error
+	if err != nil {
+		//文章不存在
+		log.Println("[AddWatchNum] Add WatchNum Error")
 		pkg.ResponseJsonError(c, pkg.ERROR_SQL)
 		return
 	}

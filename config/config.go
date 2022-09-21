@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gblog_api/api"
 	"gblog_api/global"
+	"gblog_api/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
@@ -26,11 +27,14 @@ type Config struct {
 }
 
 func RegisterConfigCenter() {
-
 	//初始化配置文件
 	GlobalConfigCenter.InitViper()
 	//初始化数据库
 	GlobalConfigCenter.InitDataBase()
+	//初始化Redis
+	GlobalConfigCenter.InitRedis()
+	//初始化JWT
+	GlobalConfigCenter.InitJWT()
 	//初始化路由
 	GlobalConfigCenter.InitRouter()
 }
@@ -96,4 +100,27 @@ func (c *Config) InitDataBase() {
 	}
 	DBAutoCreate()
 	log.Println("[InitDataBase] init database success")
+}
+
+func (c *Config) InitRedis() {
+	log.Println("[InitRedis] Start Init Redis")
+	host := viper.GetString("Redis.RedisHost")
+	port := viper.GetString("Redis.RedisPort")
+	password := viper.GetString("Redis.RedisPassWord")
+	address := fmt.Sprintf("%s:%s", host, port)
+	utils.Pool = utils.NewPool(address, password)
+	if _, err := utils.Pool.Dial(); err != nil {
+		panic(fmt.Sprintf("Redis Init Error : %s", err.Error()))
+	}
+
+	log.Println("Redis Init Success ", address)
+}
+
+func (c *Config) InitJWT() {
+	JwtBytes := []byte(viper.GetString("Jwt.JwtSecret"))
+	utils.JwtSecret = JwtBytes
+	utils.Issuer = viper.GetString("Jwt.JwtAuthUser")
+	if len(utils.JwtSecret) == 0 || len(utils.Issuer) == 0 {
+		panic("JWT Init Error")
+	}
 }

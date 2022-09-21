@@ -12,6 +12,8 @@ type Article struct {
 	Content string `json:"content,omitempty" validate:"required" gorm:"type:longtext"`
 	//文章分类ID
 	CategoryID int `json:"categoryID,omitempty" validate:"required"`
+	//分类名
+	CategoryName string `json:"categoryName,omitempty"`
 	//分享数
 	ShareNum int `json:"shareNum"`
 	//观看数
