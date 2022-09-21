@@ -19,5 +19,12 @@ DBPort = "数据库端口"
 DBUser = "数据库用户名"
 DBHost = "数据库主机地址"
 DBPassWord = "数据库密码"
+[Jwt]
+JwtSecret = "Jwt秘钥"
+JwtAuthUser = "Jwt授权用户名"
+[Redis]
+RedisHost = "Redis主机"
+RedisPort = "Redis端口"
+RedisPassWord = "Redis密码"
 ```
 
