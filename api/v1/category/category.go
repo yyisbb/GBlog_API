@@ -19,6 +19,35 @@ func GetCategory(c *gin.Context) {
 }
 
 //
+// GetCategoryByID
+//  @Description: 根据ID查找分类
+//  @param c
+//
+func GetCategoryByID(c *gin.Context) {
+	//获取分类ID
+	id := c.Query("id")
+
+	if len(id) == 0 {
+		//id为空
+		log.Println("[GetCategoryByID] Param Error")
+		pkg.ResponseJsonError(c, pkg.ERROR_PARAM)
+		return
+	}
+
+	//查询是否存在该分类
+	var category models.Category
+	global.GlobalMysql.Model(models.Category{}).Where("id = ?", id).First(&category)
+	if category.ID == 0 {
+		log.Println("[GetCategoryByID] Category Not Found")
+		pkg.ResponseJsonError(c, pkg.ERROR_DATA_NOT_FUOUND)
+		return
+	}
+
+	//分类存在
+	pkg.ResponseJsonOKAndData(c, category)
+}
+
+//
 // CreateCategory
 //  @Description: 新增分类
 //  @param c
@@ -57,11 +86,18 @@ func CreateCategory(c *gin.Context) {
 //  @param c
 //
 func DeleteCategory(c *gin.Context) {
-	//获取需要删除的分类ID
-	id := c.PostForm("id")
-
-	//参数为空,参数错误
-	if len(id) == 0 {
+	//获取文章id
+	var temp struct {
+		Id int `json:"id"`
+	}
+	err := c.ShouldBindJSON(&temp)
+	if err != nil {
+		log.Println("[DeleteCategory] Json Parse Error")
+		pkg.ResponseJsonError(c, pkg.ERROR_JSONPARSE)
+		return
+	}
+	if temp.Id == 0 {
+		//id为空
 		log.Println("[DeleteCategory] Param Error")
 		pkg.ResponseJsonError(c, pkg.ERROR_PARAM)
 		return
@@ -69,7 +105,7 @@ func DeleteCategory(c *gin.Context) {
 
 	//查询是否存在该分类
 	var category models.Category
-	global.GlobalMysql.Model(models.Category{}).Where("id = ?", id).First(&category)
+	global.GlobalMysql.Model(models.Category{}).Where("id = ?", temp.Id).First(&category)
 	if category.ID == 0 {
 		log.Println("[DeleteCategory] Category Not Found")
 		pkg.ResponseJsonError(c, pkg.ERROR_DATA_NOT_FUOUND)
@@ -79,7 +115,7 @@ func DeleteCategory(c *gin.Context) {
 	//删除分类,如果该分类下有文章,则不允许删除
 	//查询该分类下所有的文章
 	var article []models.Article
-	global.GlobalMysql.Model(models.Article{}).Where("category_id = ?", id).Find(&article)
+	global.GlobalMysql.Model(models.Article{}).Where("category_id = ?", temp.Id).Find(&article)
 	if len(article) != 0 {
 		log.Println("[DeleteCategory] Category Article Is Not Null")
 		pkg.ResponseJsonError(c, pkg.ERROR_DATA_EXIST)
@@ -87,7 +123,7 @@ func DeleteCategory(c *gin.Context) {
 	}
 
 	//删除
-	if err := global.GlobalMysql.Model(models.Category{}).Delete(&models.Category{}, id).Error; err != nil {
+	if err := global.GlobalMysql.Model(models.Category{}).Delete(&models.Category{}, temp.Id).Error; err != nil {
 		log.Println("[DeleteCategory] Category Delete Error")
 		pkg.ResponseJsonError(c, pkg.ERROR_SQL)
 		return

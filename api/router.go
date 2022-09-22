@@ -29,6 +29,7 @@ func SetRouter(r *gin.Engine) {
 
 	//分类相关
 	v1Group.GET("/getCategory", category.GetCategory)
+	v1Group.GET("/getCategoryByID", category.GetCategoryByID)
 
 	//后台相关
 	v1Group.POST("/login", admin.Login)
