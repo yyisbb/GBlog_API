@@ -134,7 +134,7 @@ func GetAllArticle(c *gin.Context) {
 	var count int64
 	global.GlobalMysql.Model(models.Article{}).Count(&count)
 
-	var articles []models.Article
+	var articles []models.ArticleResp
 	if err := global.GlobalMysql.Model(models.Article{}).Scopes(utils.Paginate(page, "10")).Order("created_at desc").Find(&articles).Error; err != nil {
 		log.Println("[DeleteArticle] Articles Not Found")
 		pkg.ResponseJsonError(c, pkg.ERROR_DATA_NOT_FUOUND)

@@ -60,16 +60,6 @@ func UpdateSetting(c *gin.Context) {
 		return
 	}
 
-	var oldSetting models.Setting
-	//判断是否有该条设置
-	global.GlobalMysql.Model(models.Setting{}).Where("id = ?", setting.ID).First(&oldSetting)
-	if oldSetting.ID == 0 {
-		//id为空
-		log.Println("[UpdateSetting] Setting Not Found")
-		pkg.ResponseJsonError(c, pkg.ERROR_DATA_NOT_FUOUND)
-		return
-	}
-
 	if err := global.GlobalMysql.Model(models.Setting{}).Where("id = ?", setting.ID).Save(&setting).Error; err != nil {
 		log.Println("[UpdateSetting] Save Setting Error")
 		pkg.ResponseJsonError(c, pkg.ERROR_SQL)

@@ -16,4 +16,6 @@ type Setting struct {
 	AuthorName string `json:"authorName" validate:"required"`
 	//首页文字
 	HomeText string `json:"homeText"`
+	//关于界面介绍
+	AboutContent string `json:"aboutContent,omitempty" gorm:"type:longtext"`
 }
