@@ -18,4 +18,6 @@ type Setting struct {
 	HomeText string `json:"homeText"`
 	//关于界面介绍
 	AboutContent string `json:"aboutContent,omitempty" gorm:"type:longtext"`
+	//Github链接
+	GithubUrl string `json:"githubUrl,omitempty"`
 }
