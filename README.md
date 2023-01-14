@@ -7,6 +7,7 @@
 - 3.配置 `config/config.toml` 配置信息
 - 4.执行 `go build main.go`
 - 5.执行 `./main`
+- 6.在数据库user表里新增一条记录,作为管理员账号
 
 ## 配置config.toml文件如下
 ```
